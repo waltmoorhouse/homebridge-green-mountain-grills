@@ -1,0 +1,67 @@
+{
+  "name": "homebridge-green-mountain-grills",
+  "displayName": "HomeBridge Green Mountain Grills",
+  "version": "1.0.0",
+  "description": "A dynamic platform plugin for homebridge to provide access to your GMG WiFi smoker.",
+  "main": "lib/index.js",
+  "scripts": {
+    "clean": "rimraf lib",
+    "lint": "eslint src/**.ts --max-warnings=0",
+    "lint:fix": "eslint src/**.ts --fix",
+    "build": "rimraf lib && tsc",
+    "watch": "npm run build && npm link && nodemon",
+    "prepublishOnly": "npm run build",
+    "postpublish": "npm run clean"
+  },
+  "author": "Walt Moorhouse <walt.moorhouse@gmail.com>",
+  "engines": {
+    "node": ">=14.18.1",
+    "homebridge": ">=1.3.5"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "greenn-mountain-grills",
+    "smoker",
+    "grill",
+    "pellet"
+  ],
+  "license": "ISC",
+  "files": [
+    "config.schema.json",
+    "LICENSE",
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/waltmoorhouse/homebridge-green-mountain-grills.git"
+  },
+  "bugs": {
+    "url": "https://github.com/waltmoorhouse/homebridge-green-mountain-grills/issues"
+  },
+  "dependencies": {
+    "ip": "^1.1.5"
+  },
+  "devDependencies": {
+    "@types/node": "^16.10.9",
+    "@types/qs": "^6.9.7",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint": "^8.0.1",
+    "homebridge": "^1.3.5",
+    "homebridge-config-ui-x": "^4.50.2",
+    "nodemon": "^2.0.20",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.3.0",
+    "typescript": "^4.4.4"
+  },
+  "funding": [
+    {
+      "type": "paypal",
+      "url": "https://www.paypal.com/paypalme/waltmoorhouse"
+    },
+    {
+      "type": "venmo",
+      "url": "https://venmo.com/?txn=pay&audience=public&recipients=Walt-Moorhouse"
+    }
+  ]
+}

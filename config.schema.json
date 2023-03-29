@@ -1,0 +1,23 @@
+{
+  "pluginAlias": "Green Mountain Grills",
+  "pluginType": "platform",
+  "singular": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "pollSeconds": {
+        "title": "Poll interval (seconds)",
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 600,
+        "required": false,
+        "default": "30"
+      },
+      "ipAddress": {
+        "title": "IP Address",
+        "type": "string",
+        "required": false
+      }
+    }
+  }
+}
