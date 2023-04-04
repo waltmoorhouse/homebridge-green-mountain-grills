@@ -1,4 +1,4 @@
-import {CharacteristicValue, PlatformAccessory, PlatformAccessoryEvent, Service} from 'homebridge'
+import {Characteristic, CharacteristicValue, Formats, Perms, PlatformAccessory, PlatformAccessoryEvent, Service, Units} from 'homebridge'
 
 import {GMGPlatform} from './dynamic-platform'
 import {AccessoryContext} from './gmg.types'
@@ -15,6 +15,10 @@ export class GMGPlatformAccessory {
   private foodTemperatureService: Service
   private pelletAlarmService: Service
   private fanService: Service
+  private currentCookingTemperatureCharacteristic: Characteristic
+  private targetCookingTemperatureCharacteristic: Characteristic
+  private currentFoodTemperatureCharacteristic: Characteristic
+  private targetFoodTemperatureCharacteristic: Characteristic
 
   constructor(
     readonly platform: GMGPlatform,
@@ -23,6 +27,52 @@ export class GMGPlatformAccessory {
     this.context = accessory.context as AccessoryContext
     this.context.tempDisplayUnit = this.platform.Characteristic.TemperatureDisplayUnits.FAHRENHEIT
     const smoker = this.context.smoker
+
+    // Custom Characteristics
+    this.currentCookingTemperatureCharacteristic = new this.platform.Characteristic('Current Cooking Temperature',
+      '42000000-0000-1000-8000-0026BB765291',
+      {
+        format: Formats.FLOAT,
+        perms: [Perms.NOTIFY, Perms.PAIRED_READ],
+        unit: Units.CELSIUS,
+        minValue: 0,
+        maxValue: 1000,
+        minStep: 0.1,
+      })
+
+    this.targetCookingTemperatureCharacteristic = new this.platform.Characteristic('Target Cooking Temperature',
+      '42000001-0000-1000-8000-0026BB765291',
+      {
+        format: Formats.FLOAT,
+        perms: [Perms.NOTIFY, Perms.PAIRED_READ, Perms.PAIRED_WRITE],
+        unit: Units.CELSIUS,
+        minValue: 0,
+        maxValue: 1000,
+        minStep: 0.1,
+      })
+
+    this.currentFoodTemperatureCharacteristic = new this.platform.Characteristic('Current Food Temperature',
+      '42000010-0000-1000-8000-0026BB765291',
+      {
+        format: Formats.FLOAT,
+        perms: [Perms.NOTIFY, Perms.PAIRED_READ],
+        unit: Units.CELSIUS,
+        minValue: 0,
+        maxValue: 260,
+        minStep: 0.1,
+      })
+
+    this.targetFoodTemperatureCharacteristic = new this.platform.Characteristic('Target Food Temperature',
+      '42000011-0000-1000-8000-0026BB765291',
+      {
+        format: Formats.FLOAT,
+        perms: [Perms.NOTIFY, Perms.PAIRED_READ, Perms.PAIRED_WRITE],
+        unit: Units.CELSIUS,
+        minValue: 0,
+        maxValue: 260,
+        minStep: 0.1,
+      })
+
     // set accessory information
     const informationService = accessory.getService(this.platform.Service.AccessoryInformation)!
     informationService
@@ -58,9 +108,9 @@ export class GMGPlatformAccessory {
     this.grillThermostatService.getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
       .onGet(this.getTargetPowerState.bind(this))
       .onSet(this.setGrillPower.bind(this))
-    this.grillThermostatService.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+    this.grillThermostatService.addCharacteristic(this.currentCookingTemperatureCharacteristic)
       .onGet(this.getCurrentGrillTemp.bind(this))
-    this.grillThermostatService.getCharacteristic(this.platform.Characteristic.TargetTemperature)
+    this.grillThermostatService.addCharacteristic(this.targetCookingTemperatureCharacteristic)
       .onGet(this.getTargetGrillTemp.bind(this))
       .onSet(this.setGrillTemp.bind(this))
     this.grillThermostatService.getCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits)
@@ -74,9 +124,9 @@ export class GMGPlatformAccessory {
       .onGet(this.getFoodProbeState.bind(this))
     this.foodTemperatureService.getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
       .onGet(this.getFoodProbeState.bind(this))
-    this.foodTemperatureService.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+    this.foodTemperatureService.addCharacteristic(this.currentFoodTemperatureCharacteristic)
       .onGet(this.getCurrentFoodTemp.bind(this))
-    this.foodTemperatureService.getCharacteristic(this.platform.Characteristic.TargetTemperature)
+    this.foodTemperatureService.addCharacteristic(this.targetFoodTemperatureCharacteristic)
       .onGet(this.getTargetFoodTemp.bind(this))
       .onSet(this.setFoodTemp.bind(this))
     this.foodTemperatureService.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
@@ -104,15 +154,17 @@ export class GMGPlatformAccessory {
             this.getCurrentPowerState())
           this.grillThermostatService.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState,
             this.getTargetPowerState())
-          this.grillThermostatService.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.getCurrentGrillTemp())
-          this.grillThermostatService.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.getTargetGrillTemp())
+          this.grillThermostatService.updateCharacteristic(this.currentCookingTemperatureCharacteristic.displayName,
+            this.getCurrentGrillTemp())
+          this.grillThermostatService.updateCharacteristic(this.targetCookingTemperatureCharacteristic.displayName,
+            this.getTargetGrillTemp())
 
           this.foodTemperatureService.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState,
             this.getFoodProbeState())
           this.foodTemperatureService.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState,
             this.getFoodProbeState())
-          this.foodTemperatureService.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.getCurrentFoodTemp())
-          this.foodTemperatureService.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.getTargetFoodTemp())
+          this.foodTemperatureService.updateCharacteristic(this.currentFoodTemperatureCharacteristic.displayName, this.getCurrentFoodTemp())
+          this.foodTemperatureService.updateCharacteristic(this.targetFoodTemperatureCharacteristic.displayName, this.getTargetFoodTemp())
         }
       })
       .catch(err => this.platform.log.error(err))

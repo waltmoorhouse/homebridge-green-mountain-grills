@@ -1,7 +1,7 @@
 {
   "name": "homebridge-green-mountain-grills",
   "displayName": "HomeBridge Green Mountain Grills",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A dynamic platform plugin for homebridge to provide access to your GMG WiFi smoker.",
   "main": "lib/index.js",
   "scripts": {
