@@ -30,7 +30,7 @@ export class GMGPlatformAccessory {
 
     // Custom Characteristics
     this.currentCookingTemperatureCharacteristic = new this.platform.Characteristic('Current Cooking Temperature',
-      '42000000-0000-1000-8000-0026BB765291',
+      '42010000-0000-1000-8000-0026BB765291',
       {
         format: Formats.FLOAT,
         perms: [Perms.NOTIFY, Perms.PAIRED_READ],
