@@ -15,7 +15,6 @@ import {SmokerService} from './gmg-service'
 import {AccessoryContext, Smoker} from './gmg.types'
 
 export class GMGPlatform implements DynamicPlatformPlugin {
-  public readonly VERSION = '1.0.3' // This should always match package.json version
   public readonly Service: typeof Service = this.api.hap.Service
   public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic
 
@@ -54,44 +53,11 @@ export class GMGPlatform implements DynamicPlatformPlugin {
     // Get smokers from API
     const smokers = [await this.smokerService.getSmoker()]
 
-    // Register Controllers not found in the cache
-    smokers.forEach(smoker => {
-      // Check to see if controllers already registered in accessories
-      let found = false
-      for (const accessory of this.cachedAccessories) {
-        const ctx = accessory.context as AccessoryContext
-        if (smoker.deviceId === ctx.smoker.deviceId) {
-          if (this.VERSION === accessory.context.version) {
-            found = true
-          } else {
-            this.log.warn(`Old version of Smoker ${smoker.deviceId} was found, removing so it can be reconfigured.`)
-            this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory])
-            this.cachedAccessories = this.cachedAccessories.filter(cached => cached.UUID !== accessory.UUID)
-          }
-        }
-      }
-      if (!found) {
-        this.register(smoker).then(() => this.log.debug('smoker registered'))
-      }
-    })
+    // Remove all cached smokers
+    this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, this.cachedAccessories)
 
-    // Configure cached controllers that are still registered, and Remove controllers that are no longer registered
-    const toBeRemoved: PlatformAccessory[] = []
-    this.cachedAccessories.forEach(accessory => {
-      const ctx = accessory.context as AccessoryContext
-      if (smokers.find(smoker => smoker.deviceId === ctx.smoker.deviceId)) {
-        this.log.info('The cached smoker  %s is still registered to this account. Configuring.', ctx.smoker.deviceId)
-        this.smokers.set(ctx.smoker.deviceId, new GMGPlatformAccessory(this, accessory))
-      } else {
-        this.log.info(ctx.smoker.deviceId +
-          ' is no longer registered to this account. Removing from homebridge.')
-        toBeRemoved.push(accessory)
-      }
-    })
-
-    if (toBeRemoved.length > 0) {
-      this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, toBeRemoved)
-    }
+    // Register smokers
+    smokers.forEach(this.register.bind(this))
 
     // We don't want to set another interval for the poller if we're already running it.
     if (!this.alreadyPolling) {
@@ -102,14 +68,13 @@ export class GMGPlatform implements DynamicPlatformPlugin {
   }
 
   private async register(smoker: Smoker) {
-    this.log.info(`Discovered Smoker: ${smoker.deviceId}.`)
+    this.log.info(`Discovered GMG Smoker: ${smoker.deviceId}.`)
     const uuid = this.generate(smoker.deviceId)
     // create a new accessory
-    const accessory = new this.api.platformAccessory('GMG Smoker', uuid)
+    const accessory = new this.api.platformAccessory('Grill', uuid)
 
     // Add context to accessory
     const context = accessory.context as AccessoryContext
-    context.version = this.VERSION
     context.smoker = smoker
 
     // Initialize the controller

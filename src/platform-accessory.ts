@@ -30,7 +30,7 @@ export class GMGPlatformAccessory {
 
     // Custom Characteristics
     this.currentCookingTemperatureCharacteristic = new this.platform.Characteristic('Current Cooking Temperature',
-      '42010000-0000-1000-8000-0026BB765291',
+      '42000000-0000-1000-8000-0026BB765291',
       {
         format: Formats.FLOAT,
         perms: [Perms.NOTIFY, Perms.PAIRED_READ],
@@ -116,6 +116,7 @@ export class GMGPlatformAccessory {
     this.grillThermostatService.getCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits)
       .onGet(this.getTemperatureDisplayUnits.bind(this))
       .onSet(this.setTemperatureDisplayUnits.bind(this))
+
     // Adjustable Thermostat for Desired Food Temp
     this.foodTemperatureService = accessory.getService('Food Temp') ||
       accessory.addService(this.platform.Service.Thermostat, 'Food Temp', 'Food Temp')

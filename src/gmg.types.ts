@@ -1,5 +1,4 @@
 export type AccessoryContext = {
-  version: string
   smoker: Smoker
   tempDisplayUnit: number
 }
