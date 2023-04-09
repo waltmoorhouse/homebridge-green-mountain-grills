@@ -57,23 +57,33 @@ class GMGClient {
   }
 
   async getGrillModelAndFirmware() {
-    const result = (await this.sendCommand(commands.getGrillModel)).msg.toString()
-    const fw = result.substring(11)
-    switch(result.substring(2, 4)) {
-      case 'DB': return {model: 'Daniel Boone', firmware: fw}
-      case 'JB': return {model: 'Jim Bowie', firmware: fw}
-      default: return {model: 'Unknown', firmware: result}
+    try {
+      const result = (await this.sendCommand(commands.getGrillModel)).msg.toString()
+      const fw = result.substring(11)
+      switch(result.substring(2, 4)) {
+        case 'DB': return {model: 'Daniel Boone', firmware: fw}
+        case 'JB':
+          return {model: 'Jim Bowie', firmware: fw}
+        default:
+          return {model: 'Unknown', firmware: result}
+      }
+    } catch (e) {
+      this._logger(e)
     }
   }
 
   async getGrillStatus() {
-    const result = await this.sendCommand(commands.getGrillStatus)
-    return new GrillStatus(result.msg)
+    try {
+      const result = await this.sendCommand(commands.getGrillStatus)
+      return new GrillStatus(result.msg)
+    } catch (e) {
+      this._logger(e)
+    }
   }
 
   async powerToggleGrill() {
     const status = await this.getGrillStatus()
-    if (status.isOn) {
+    if (status?.isOn) {
       await this._powerOffGrill(status)
     } else {
       await this._powerOnGrill(status)
@@ -92,7 +102,7 @@ class GMGClient {
 
   async setGrillTemp(fahrenheit) {
     const status = await this.getGrillStatus()
-    if (!status.isOn) {
+    if (!status?.isOn) {
       const error = new Error('Cannot set grill temperature when the gill is off!')
       this._logger(error.message)
       throw error
@@ -105,7 +115,7 @@ class GMGClient {
 
   async setFoodTemp(fahrenheit) {
     const status = await this.getGrillStatus()
-    if (!status.isOn) {
+    if (!status?.isOn) {
       const error = new Error('Cannot set food temperature when the gill is off!')
       this._logger(error.message)
       throw error
@@ -240,7 +250,7 @@ class GMGClient {
     await this._validateResult(result, newState => newState.isOn)
   }
 
-  async _validateResult(result, validator) {
+  async _validateResult(result, _validator) {
     const response = result.msg.toString()
     if (response !== results.OK) {
       throw new Error(`Grill responded with non OK status -> ${response}`)

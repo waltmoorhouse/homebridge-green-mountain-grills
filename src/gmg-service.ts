@@ -12,13 +12,18 @@ export class SmokerService {
   }
 
   async getSmoker(): Promise<Smoker> {
-    const modafw = await this.gmgClient.getGrillModelAndFirmware()
-    return {
-      ipAddress: await this.gmgClient.discoverGrill(),
-      deviceId: await this.gmgClient.getGrillId(),
-      status: await this.gmgClient.getGrillStatus(),
-      deviceModel: modafw.model,
-      firmware: modafw.firmware
+    try {
+      const modafw = await this.gmgClient.getGrillModelAndFirmware()
+      return {
+        ipAddress: await this.gmgClient.discoverGrill(),
+        deviceId: await this.gmgClient.getGrillId(),
+        status: await this.gmgClient.getGrillStatus(),
+        deviceModel: modafw.model,
+        firmware: modafw.firmware
+      }
+    } catch (e) {
+      this.log.error(e)
+      return Promise.reject(e)
     }
   }
 

@@ -9,7 +9,7 @@ Your smoker will need to be in WiFi mode, and discoverable by the app for this t
 
 You will need to select the *Polling Interval* (this is how often the
 app will poll the GMG to update the device status) which is
-measured in seconds. The value must be between 1 and 600.
+measured in seconds. The value must be between 1 and 600. Default is 30.
 
 If you are using DHCP to keep your grill on a certain IP, you can enter that in the *IP Address* field, otherwise
 the plugin will attempt to discover the grill automatically.
