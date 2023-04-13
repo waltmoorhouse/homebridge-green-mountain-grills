@@ -1,4 +1,5 @@
 # Green Mountain Grills HomeBridge Plug-in
+[![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
 
 ## Introduction
 

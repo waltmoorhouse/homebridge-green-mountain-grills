@@ -5,6 +5,11 @@
   "schema": {
     "type": "object",
     "properties": {
+      "name": {
+        "title": "Plugin name as shown in Homebridge Log",
+        "default": "Green Mountain Grills",
+        "required": true
+      },
       "pollSeconds": {
         "title": "Poll interval (seconds)",
         "type": "integer",
