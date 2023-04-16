@@ -36,8 +36,8 @@ export class GMGPlatformAccessory {
           format: Formats.FLOAT,
           perms: [Perms.NOTIFY, Perms.PAIRED_READ],
           unit: Units.CELSIUS,
-          minValue: 0,
-          maxValue: 1000,
+          minValue: 65.5,
+          maxValue: 260,
           minStep: 0.1,
         })
 
@@ -47,8 +47,8 @@ export class GMGPlatformAccessory {
           format: Formats.FLOAT,
           perms: [Perms.NOTIFY, Perms.PAIRED_READ, Perms.PAIRED_WRITE],
           unit: Units.CELSIUS,
-          minValue: 0,
-          maxValue: 1000,
+          minValue: 65.5,
+          maxValue: 260,
           minStep: 0.1,
         })
 
